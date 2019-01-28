@@ -5,7 +5,8 @@ import seaborn as sns
 import numpy as np
 
 
-def boostrap(sample, sample_size, iterations, ci=95):
+def boostrap(sample, sample_size, iterations, ci=95, seed=None):
+    np.random.seed(seed)
     data = np.random.choice(a=sample, size=(iterations, sample_size))
     data_mean = np.mean(data)
     sorted_iteration_means = np.sort(np.mean(data, axis=1))
@@ -23,7 +24,9 @@ if __name__ == "__main__":
     data = df.values.T[1]
     boots = []
     for i in range(100, 100000, 1000):
-        boot = boostrap(data, data.shape[0], i)
+        boot = boostrap(data, data.shape[0], i, 85)
+        # boot = boostrap(data, data.shape[0], i, 85,0)
+        # import pdb; pdb.set_trace()
         boots.append([i, boot[0], "mean"])
         boots.append([i, boot[1], "lower"])
         boots.append([i, boot[2], "upper"])
@@ -36,7 +39,3 @@ if __name__ == "__main__":
 
         sns_plot.savefig("bootstrap_confidence.png", bbox_inches='tight')
         sns_plot.savefig("bootstrap_confidence.pdf", bbox_inches='tight')
-
-
-        #print ("Mean: %f")%(np.mean(data))
-        #print ("Var: %f")%(np.var(data))
