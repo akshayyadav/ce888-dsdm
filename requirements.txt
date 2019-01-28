@@ -3,6 +3,7 @@ jupyter
 matplotlib
 numpy
 pandas
+scikit-learn[alldeps]
 scipy
 seaborn
-scikit-learn[alldeps]
+tensorflow
