@@ -2,5 +2,7 @@ ipython
 jupyter
 matplotlib
 numpy
-scikit-learn[alldeps]
+pandas
 scipy
+seaborn
+scikit-learn[alldeps]
