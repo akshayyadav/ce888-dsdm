@@ -1,5 +1,6 @@
 ipython
 jupyter
+jupyterlab
 matplotlib
 numpy
 pandas
