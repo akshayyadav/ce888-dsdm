@@ -1,5 +1,7 @@
 ipython
 jupyter
+jupyter_contrib_nbextensions
+jupyter_nbextensions_configurator
 jupyterlab
 matplotlib
 numpy
