@@ -268,6 +268,92 @@ class OthelloState:
             s += "\n"
         return s
 
+
+class Connect4State:
+    """ A state of the game of Connect4, i.e. the game board.
+        The board is a 2D array where 0 = empty (.), 1 = player 1 (X), 2 = player 2 (O).
+        In connect4 players alternately drop pieces down one of the 7 columns
+        of a board with 6 rows - aiming that the piece dropped creates a row, column or
+        diagonal of 4 pieces.
+    """
+
+    def __init__(self):
+        self.playerJustMoved = 2  # At the root pretend the player just moved is p2 - p1 has the first move
+        self.board = []  # 0 = empty, 1 = player 1, 2 = player 2
+        self.winner = 0 # No winner yet
+        for y in range(7):
+            self.board.append([0] * 6) # six zeroes in each column
+
+    def Clone(self):
+        """ Create a deep clone of this game state.
+        """
+        st = Connect4State()
+        st.playerJustMoved = self.playerJustMoved
+        st.winner = self.winner
+        st.board = [self.board[col][:] for col in range(7)]
+        return st
+
+    def DoMove(self, movecol):
+        """ Update a state by carrying out the given move.
+            Must update playerToMove.
+        """
+
+        assert movecol >= 0  and movecol <= 6 and self.board[movecol][5] == 0
+        row = 5
+        while row >= 0 and self.board[movecol][row] == 0:
+            row -= 1 # find the first occupied row (or 0 for the bottom of the board
+
+        row += 1 # the first empty space in movecol
+
+        self.playerJustMoved = 3 - self.playerJustMoved # new player
+        self.board[movecol][row] = self.playerJustMoved # drop the counter
+        if self.DoesMoveWin(movecol, row):
+            self.winner =  self.playerJustMoved # record the win
+
+    def GetMoves(self):
+        """ Get all possible moves from this state - i.e. all columns with at least one empty space.
+        """
+        if self.winner != 0:
+            return [] # no moves since someone has already won (in DoMove())
+        return [col for col in range(7) if self.board[col][5] == 0] # columns a list of columns with space
+
+    def DoesMoveWin(self, x, y):
+        """ Does the move at (x,y) win by forming a row, column or diagonal of length at least 4?
+        """
+        me = self.board[x][y]
+        for (dx, dy) in [(0, +1), (+1, +1), (+1, 0), (+1, -1)]:
+            p = 1
+            while self.IsOnBoard(x+p*dx,y+p*dy) and self.board[x+p*dx][y+p*dy] == me:
+                p += 1
+            # (x+(p-1)*dx,y+(p-1)*dy) is the last counter of my colour in direction (dx,dy) starting from (x,y)
+
+            n = 1
+            while self.IsOnBoard(x-n*dx,y-n*dy) and self.board[x-n*dx][y-n*dy] == me:
+                n += 1
+            # (x-(n-1)*dx,y-(n-1)*dy) is the last counter of my colour in direction (-dx,-dy) starting from (x,y)
+
+            if p + n >= 5: # want (p-1) + (n-1) + 1 >= 4, or more simply p + n >- 5
+                return True
+
+        return False
+
+    def IsOnBoard(self, x, y):
+        return x >= 0 and x < 7 and y >= 0 and y < 6
+
+    def GetResult(self, playerjm):
+        """ Get the game result from the viewpoint of playerjm.
+        """
+        return playerjm == self.winner
+
+    def __repr__(self):
+        s = ""
+        for x in range(5,-1,-1):
+            for y in range(7):
+                s += ".XO"[self.board[y][x]]
+            s += "\n"
+        return s
+
+
 class Node:
     """ A node in the game tree. self.wins is always from the viewpoint of playerJustMoved.
         Crashes if state not specified.
@@ -374,6 +460,7 @@ def UCTPlayGame():
 
     # state = OthelloState(4) # uncomment to play Othello on a square board of the given size
     # state = OXOState()      # uncomment to play OXO
+    # state = Connect4State() # uncomment to play Connect4
     state = NimState(15)    # uncomment to play Nim with the given number of starting chips
     while (state.GetMoves() != []): # while not terminal state
         print(str(state))
