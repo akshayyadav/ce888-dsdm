@@ -4,11 +4,11 @@
 # is orders of magnitude less efficient than it could be made, particularly by using a
 # state.GetRandomMove() or state.DoRandomRollout() function.
 #
-# Example GameState classes for Nim, OXO and Othello are included to give some idea of how you
+# Example GameState classes for Nim, OXO, Othello and Connect4 are included to give some idea of how you
 # can write your own GameState use UCT in your 2-player game. Change the game to be played in
 # the UCTPlayGame() function at the bottom of the code.
 #
-# Written by Peter Cowling, Ed Powley, Daniel Whitehouse (University of York, UK) September 2012.
+# Written by Peter Cowling, Ed Powley, Daniel Whitehouse (University of York, UK) September 2012 - 2017.
 #
 # Licence is granted to freely use and distribute for any sensible/legal purpose so long as this comment
 # remains in any distributed code.
@@ -25,8 +25,9 @@ class GameState:
         GetRandomMove() function to generate a random move during rollout.
         By convention the players are numbered 1 and 2.
     """
+
     def __init__(self):
-            self.playerJustMoved = 2 # At the root pretend the player just moved is player 2 - player 1 has the first move
+        self.playerJustMoved = 2 # At the root pretend the player just moved is player 2 - player 1 has the first move
 
     def Clone(self):
         """ Create a deep clone of this game state.
@@ -62,6 +63,7 @@ class NimState:
         (by choosing k) chips.
         Any initial state of the form 4n is a win for player 2.
     """
+
     def __init__(self, ch):
         self.playerJustMoved = 2 # At the root pretend the player just moved is p2 - p1 has the first move
         self.chips = ch
@@ -84,7 +86,7 @@ class NimState:
     def GetMoves(self):
         """ Get all possible moves from this state.
         """
-        return list(range(1,min([4, self.chips + 1])))
+        return list(range(1, min([4, self.chips + 1])))
 
     def GetResult(self, playerjm):
         """ Get the game result from the viewpoint of playerjm.
@@ -107,9 +109,10 @@ class OXOState:
         678
         where 0 = empty, 1 = player 1 (X), 2 = player 2 (O)
     """
+
     def __init__(self):
         self.playerJustMoved = 2 # At the root pretend the player just moved is p2 - p1 has the first move
-        self.board = [0,0,0,0,0,0,0,0,0] # 0 = empty, 1 = player 1, 2 = player 2
+        self.board = [0, 0, 0, 0, 0, 0, 0, 0, 0]  # 0 = empty, 1 = player 1, 2 = player 2
 
     def Clone(self):
         """ Create a deep clone of this game state.
@@ -133,9 +136,9 @@ class OXOState:
         return [i for i in range(9) if self.board[i] == 0]
 
     def GetResult(self, playerjm):
-        """ Get the game result from the viewpoint of playerjm.
+        """ Get the game result from the viewpoint of playerjm for a finished game.
         """
-        for (x,y,z) in [(0,1,2),(3,4,5),(6,7,8),(0,3,6),(1,4,7),(2,5,8),(0,4,8),(2,4,6)]:
+        for (x, y, z) in [(0, 1, 2), (3, 4, 5), (6, 7, 8), (0, 3, 6), (1, 4, 7), (2, 5, 8), (0, 4, 8), (2, 4, 6)]:
             if self.board[x] == self.board[y] == self.board[z]:
                 if self.board[x] == playerjm:
                     return 1.0
@@ -145,7 +148,7 @@ class OXOState:
         assert False # Should not be possible to get here
 
     def __repr__(self):
-        s= ""
+        s = ""
         for i in range(9):
             s += ".XO"[self.board[i]]
             if i % 3 == 2: s += "\n"
@@ -266,10 +269,11 @@ class OthelloState:
         return s
 
 class Node:
-    """ A node in the game tree. Note wins is always from the viewpoint of playerJustMoved.
+    """ A node in the game tree. self.wins is always from the viewpoint of playerJustMoved.
         Crashes if state not specified.
     """
-    def __init__(self, move = None, parent = None, state = None):
+
+    def __init__(self, move=None, parent=None, state=None):
         self.move = move # the move that got us to this node - "None" for the root node
         self.parentNode = parent # "None" for the root node
         self.childNodes = []
@@ -283,20 +287,20 @@ class Node:
             lambda c: c.wins/c.visits + UCTK * sqrt(2*log(self.visits)/c.visits to vary the amount of
             exploration versus exploitation.
         """
-        s = sorted(self.childNodes, key = lambda c: c.wins/c.visits + sqrt(2*log(self.visits)/c.visits))[-1]
+        s = sorted(self.childNodes, key=lambda c: c.wins / c.visits + sqrt(2 * log(self.visits) / c.visits))[-1]
         return s
 
     def AddChild(self, m, s):
         """ Remove m from untriedMoves and add a new child node for this move.
             Return the added child node
         """
-        n = Node(move = m, parent = self, state = s)
+        n = Node(move=m, parent=self, state=s)
         self.untriedMoves.remove(m)
         self.childNodes.append(n)
         return n
 
     def Update(self, result):
-        """ Update this node - one additional visit and result additional wins. result must be from the viewpoint of playerJustmoved.
+        """ Update this node - one additional visit and result additional wins. Result must be from the viewpoint of playerJustmoved.
         """
         self.visits += 1
         self.wins += result
@@ -307,28 +311,28 @@ class Node:
     def TreeToString(self, indent):
         s = self.IndentString(indent) + str(self)
         for c in self.childNodes:
-             s += c.TreeToString(indent+1)
+            s += c.TreeToString(indent + 1)
         return s
 
-    def IndentString(self,indent):
+    def IndentString(self, indent):
         s = "\n"
-        for i in range (1,indent+1):
+        for i in range(1, indent + 1):
             s += "| "
         return s
 
     def ChildrenToString(self):
         s = ""
         for c in self.childNodes:
-             s += str(c) + "\n"
+            s += str(c) + "\n"
         return s
 
 
-def UCT(rootstate, itermax, verbose = False):
+def UCT(rootstate, itermax, verbose=False):
     """ Conduct a UCT search for itermax iterations starting from rootstate.
         Return the best move from the rootstate.
         Assumes 2 alternating players (player 1 starts), with game results in the range [0.0, 1.0]."""
 
-    rootnode = Node(state = rootstate)
+    rootnode = Node(state=rootstate)
 
     for i in range(itermax):
         node = rootnode
@@ -343,46 +347,49 @@ def UCT(rootstate, itermax, verbose = False):
         if node.untriedMoves != []: # if we can expand (i.e. state/node is non-terminal)
             m = random.choice(node.untriedMoves)
             state.DoMove(m)
-            node = node.AddChild(m,state) # add child and descend tree
+            node = node.AddChild(m, state)  # add child and descend tree
 
         # Rollout - this can often be made orders of magnitude quicker using a state.GetRandomMove() function
         while state.GetMoves() != []: # while state is non-terminal
             state.DoMove(random.choice(state.GetMoves()))
 
         # Backpropagate
-        while node != None: # backpropagate from the expanded node and work back to the root node
-            node.Update(state.GetResult(node.playerJustMoved)) # state is terminal. Update node with result from POV of node.playerJustMoved
+        while node != None:  # backpropagate from the expanded node and work back to the root node
+            node.Update(state.GetResult(node.playerJustMoved))  # Update node with result from POV of node.playerJustMoved
             node = node.parentNode
 
     # Output some information about the tree - can be omitted
-    if (verbose): print(rootnode.TreeToString(0))
-    else: print(rootnode.ChildrenToString())
+    if (verbose):
+        print(rootnode.TreeToString(0))
+    else:
+        print(rootnode.ChildrenToString())
 
-    return sorted(rootnode.childNodes, key = lambda c: c.visits)[-1].move # return the move that was most visited
+    return sorted(rootnode.childNodes, key=lambda c: c.visits)[-1].move  # return the move that was most visited
+
 
 def UCTPlayGame():
     """ Play a sample game between two UCT players where each player gets a different number
         of UCT iterations (= simulations = tree nodes).
     """
+
     # state = OthelloState(4) # uncomment to play Othello on a square board of the given size
-    # state = OXOState() # uncomment to play OXO
-    state = NimState(15) # uncomment to play Nim with the given number of starting chips
-    while (state.GetMoves() != []):
+    # state = OXOState()      # uncomment to play OXO
+    state = NimState(15)    # uncomment to play Nim with the given number of starting chips
+    while (state.GetMoves() != []): # while not terminal state
         print(str(state))
         if state.playerJustMoved == 1:
-            m = UCT(rootstate = state, itermax = 1000, verbose = False) # play with values for itermax and verbose = True
+            m = UCT(rootstate=state, itermax=1000, verbose=False)  # play with values for itermax and verbose = True
         else:
-            m = UCT(rootstate = state, itermax = 100, verbose = False)
+            m = UCT(rootstate=state, itermax=100, verbose=False)  # play with values for itermax and verbose = True
         print("Best Move: " + str(m) + "\n")
         state.DoMove(m)
     if state.GetResult(state.playerJustMoved) == 1.0:
         print("Player " + str(state.playerJustMoved) + " wins!")
     elif state.GetResult(state.playerJustMoved) == 0.0:
         print("Player " + str(3 - state.playerJustMoved) + " wins!")
-    else: print("Nobody wins!")
+    else:
+        print("Nobody wins!")
 
 if __name__ == "__main__":
-    """ Play a single game to the end using UCT for both players.
-    """
+    """ Play a single game to the end using UCT for both players."""
     UCTPlayGame()
-
