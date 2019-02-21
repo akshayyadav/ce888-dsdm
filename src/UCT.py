@@ -65,8 +65,11 @@ class NimState:
     """
 
     def __init__(self, ch):
+        self.chips           = ch
         self.playerJustMoved = 2 # At the root pretend the player just moved is p2 - p1 has the first move
-        self.chips = ch
+        self.playerNext      = 1
+        self.lastMoved       = 0
+        self.winner          = 0 # No winner yet
 
     def Clone(self):
         """ Create a deep clone of this game state.
@@ -81,6 +84,8 @@ class NimState:
         """
         assert move >= 1 and move <= 3 and move == int(move)
         self.chips -= move
+        self.lastMoved = move
+        self.playerNext      = self.playerJustMoved
         self.playerJustMoved = 3 - self.playerJustMoved
 
     def GetMoves(self):
@@ -93,12 +98,35 @@ class NimState:
         """
         assert self.chips == 0
         if self.playerJustMoved == playerjm:
-            return 1.0 # playerjm took the last chip and has won
+            self.winner = self.playerJustMoved
+            return 1.0
         else:
-            return 0.0 # playerjm's opponent took the last chip and has won
+            self.winner = self.playerNext
+            return 0.0
+
+    def __str__(self):
+        return f'{self.chips:02d},{self.lastMoved},{self.playerJustMoved},{self.playerNext},{self.winner}'
 
     def __repr__(self):
-        s = "Chips:" + str(self.chips) + " JustPlayed:" + str(self.playerJustMoved)
+        s = ""
+        for chip in range(self.chips):
+            s += "-"
+            for moved in range(self.lastMoved):
+                s += "  -"
+            s += "now  removed\n"
+        return s
+        # return f'Chips:{self.chips}\nLast chips moved:{self.lastMoved}\nLast player:{self.playerJustMoved}\nNext player:{self.playerNext}\nWinner:{self.winner}'
+        s = ""
+        noOfChips = int(self.chips+1)
+        totalPositions = int(noOfChips + self.lastMoved)
+        for chip in range(1, noOfChips):
+            s += "0".ljust(3)
+        for removed in range(noOfChips, totalPositions):
+            s += "X".ljust(3)
+        # s += "\n"
+        # # s += "\nRemoved: {}".format(self.lastMoved)
+        # for chip in range(1, totalPositions):
+        #     s += "{}".format(chip).ljust(3)
         return s
 
 class OXOState:
@@ -445,10 +473,10 @@ def UCT(rootstate, itermax, verbose=False):
             node = node.parentNode
 
     # Output some information about the tree - can be omitted
-    if (verbose):
-        print(rootnode.TreeToString(0))
-    else:
-        print(rootnode.ChildrenToString())
+    # if (verbose):
+    #     print(rootnode.TreeToString(0))
+    # else:
+    #     print(rootnode.ChildrenToString())
 
     return sorted(rootnode.childNodes, key=lambda c: c.visits)[-1].move  # return the move that was most visited
 
@@ -465,17 +493,20 @@ def UCTPlayGame():
     while (state.GetMoves() != []): # while not terminal state
         print(str(state))
         if state.playerJustMoved == 1:
-            m = UCT(rootstate=state, itermax=1000, verbose=False)  # play with values for itermax and verbose = True
+            m = UCT(rootstate=state, itermax=100, verbose=False)  # play with values for itermax and verbose = True
         else:
             m = UCT(rootstate=state, itermax=100, verbose=False)  # play with values for itermax and verbose = True
-        print("Best Move: " + str(m) + "\n")
+        # print("Best Move: " + str(m) + "\n")
         state.DoMove(m)
-    if state.GetResult(state.playerJustMoved) == 1.0:
-        print("Player " + str(state.playerJustMoved) + " wins!")
-    elif state.GetResult(state.playerJustMoved) == 0.0:
-        print("Player " + str(3 - state.playerJustMoved) + " wins!")
-    else:
-        print("Nobody wins!")
+    # if state.GetResult(state.playerJustMoved) == 1.0:
+    #     print("Player " + str(state.playerJustMoved) + " wins!")
+    # elif state.GetResult(state.playerJustMoved) == 0.0:
+    #     print("Player " + str(3 - state.playerJustMoved) + " wins!")
+    # else:
+    #     print("Nobody wins!")
+
+    state.GetResult(state.playerJustMoved)
+    print(str(state))
 
 if __name__ == "__main__":
     """ Play a single game to the end using UCT for both players."""
