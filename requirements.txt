@@ -3,6 +3,7 @@ jupyter
 jupyter_contrib_nbextensions
 jupyter_nbextensions_configurator
 jupyterlab
+keras
 matplotlib
 numpy
 pandas
