@@ -1,0 +1,4 @@
+[submodule "sagihaider/CE888_2019"]
+	path = sagihaider/CE888_2019
+	url = https://github.com/sagihaider/CE888_2019
+	branch = master
