@@ -19,7 +19,7 @@ class DTClassifier:
         self.data_headers = datafile_headers
         self.data         = pd.read_csv(datafile, delimiter = ",", names = self.data_headers)
         self.clf          = DecisionTreeClassifier(criterion=criterion)
-        self.features     = ["chips", "playerJustMoved", "playerNext"]
+        self.features     = ["chips"]
         self.labels       = ["lastMoved"]
         self.trained      = False
         self.predicted    = False

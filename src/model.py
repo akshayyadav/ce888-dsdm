@@ -20,7 +20,12 @@ class Model(DTClassifier):
 
 if __name__ == '__main__':
     # import pdb; pdb.set_trace()
-    model = Model().load("../models/dtree_487610_gini_best.model")
+    model = Model().load("../models/dtree_608405_gini_best.model")
+    # model = Model().load("../models/dtree_491255_gini_best.model")
+    # model = Model().load("../models/dtree_487610_gini_best.model")
+    # model = Model()
+    # model.new_trained(datafile="../data/data_20k.csv")
     model.print_sample()
-    predicted = model.predict(np.array([[5,2,1]]))
+    # model.save()
+    predicted = model.predict(np.array([[15]]))
     print(predicted)
