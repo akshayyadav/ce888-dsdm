@@ -16,6 +16,7 @@
 # For more information about Monte Carlo Tree Search check out our web site at www.mcts.ai
 
 from math import *
+from ex_it import ExIt
 import random
 
 class GameState:
@@ -493,7 +494,7 @@ def UCTPlayGame():
     while (state.GetMoves() != []): # while not terminal state
         print(str(state))
         if state.playerJustMoved == 1:
-            m = UCT(rootstate=state, itermax=100, verbose=False)  # play with values for itermax and verbose = True
+            m = UCT(rootstate=state, itermax=1000, verbose=False)  # play with values for itermax and verbose = True
         else:
             m = UCT(rootstate=state, itermax=100, verbose=False)  # play with values for itermax and verbose = True
         # print("Best Move: " + str(m) + "\n")
@@ -508,7 +509,38 @@ def UCTPlayGame():
     state.GetResult(state.playerJustMoved)
     print(str(state))
 
+
+def UCTvsExItPlayGame():
+    """ Play a sample game between two UCT players where each player gets a different number
+        of UCT iterations (= simulations = tree nodes).
+    """
+
+    state = NimState(15)    # uncomment to play Nim with the given number of starting chips
+    while (state.GetMoves() != []): # while not terminal state
+        # print(str(state))
+        if state.playerJustMoved == 1:
+            m = UCT(rootstate=state, itermax=100, verbose=False)  # play with values for itermax and verbose = True
+        else:
+            uct_move = UCT(rootstate=state, itermax=1000, verbose=False)  # play with values for itermax and verbose = True
+            model = ExIt()
+            m = model.get_best_move(state.chips)
+            print("UCT:ExIt=" + str(uct_move) + ":" + str(m))
+            # m = numpy.array([[state.chips,state.playerJustMoved,state.playerNext]])
+        # print("Best Move: " + str(m) + "\n")
+        state.DoMove(m)
+    if state.GetResult(state.playerJustMoved) == 1.0:
+        print("Player " + str(state.playerJustMoved) + " wins!")
+    elif state.GetResult(state.playerJustMoved) == 0.0:
+        print("Player " + str(3 - state.playerJustMoved) + " wins!")
+    else:
+        print("Nobody wins!")
+
+    state.GetResult(state.playerJustMoved)
+    # print(str(state))
+
+
 if __name__ == "__main__":
     """ Play a single game to the end using UCT for both players."""
     for game in range(100):
-        UCTPlayGame()
+        # UCTPlayGame()
+        UCTvsExItPlayGame()
