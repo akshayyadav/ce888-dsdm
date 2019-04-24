@@ -6,6 +6,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.model_selection import cross_val_score
 from sklearn.metrics import accuracy_score as acc
 from sklearn.metrics import make_scorer
+from sklearn.metrics import confusion_matrix
 from sklearn.tree import export_graphviz
 from sklearn.externals.six import StringIO
 from IPython.display import Image
@@ -65,17 +66,29 @@ class DTClassifier:
         else:
             raise TypeError("Predictions for model are not available, use 'predict' method first!")
 
+    def confusion_matrix(self):
+        if self.predicted:
+            self.cfm = confusion_matrix(self.y_test, self.y_pred)
+            acc = np.sum(self.cfm.diagonal()) / np.sum(self.cfm)
+            print('Overall accuracy: {} %'.format(acc*100))
+        else:
+            raise TypeError("Predictions for model are not available, use 'predict' method first!")
+
+
     def print_sample(self):
         print("Data Sample:")
         print(self.data.head())
-        print("Train data:")
-        print(f'X_train: {self.X_train.shape}')
+        self.estimated_accuracy()
+        self.actual_prediction_accuracy()
+        self.confusion_matrix()
+        print("Confusion Matrix:")
+        print(self.cfm)
+        # print("Train data:")
+        # print(f'X_train: {self.X_train.shape}')
         # print(f'X_train: {self.X_train.head}')
         # print(f'y_train: {self.y_train.head}')
         # print(f'X_test: {self.X_test.head}')
         # print(f'y_test: {self.y_test.head}')
-        self.estimated_accuracy()
-        self.actual_prediction_accuracy()
 
     def as_graph_image(self):
         out_filename=f'dtree_{self.data.size}_{self.clf.criterion}_{self.clf.splitter}_{time.strftime("%Y%m%d_%H%M%S")}.png'
