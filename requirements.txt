@@ -1,12 +1,15 @@
+Keras
+graphviz
 ipython
+joblib
 jupyter
 jupyter_contrib_nbextensions
 jupyter_nbextensions_configurator
 jupyterlab
-keras
 matplotlib
 numpy
 pandas
+pydotplus
 scikit-learn[alldeps]
 scipy
 seaborn
