@@ -5,8 +5,7 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.model_selection import cross_val_score
 from sklearn.metrics import accuracy_score as acc
-from sklearn.metrics import make_scorer
-from sklearn.metrics import confusion_matrix
+from sklearn.metrics import make_scorer, classification_report, confusion_matrix
 from sklearn.tree import export_graphviz
 from sklearn.externals.six import StringIO
 from IPython.display import Image
@@ -74,6 +73,12 @@ class DTClassifier:
         else:
             raise TypeError("Predictions for model are not available, use 'predict' method first!")
 
+    def classification_report(self):
+        if self.predicted:
+            print(classification_report(self.y_test, self.y_pred))
+        else:
+            raise TypeError("Predictions for model are not available, use 'predict' method first!")
+
 
     def print_sample(self):
         print("Data Sample:")
@@ -83,6 +88,8 @@ class DTClassifier:
         self.confusion_matrix()
         print("Confusion Matrix:")
         print(self.cfm)
+        print("Classification Report:")
+        self.classification_report()
         # print("Train data:")
         # print(f'X_train: {self.X_train.shape}')
         # print(f'X_train: {self.X_train.head}')
