@@ -3,7 +3,7 @@ import numpy as np
 from model import Model
 
 class ExIt:
-    def __init__(self, model =Model().load("../models/dtree_608405_gini_best.model")):
+    def __init__(self, model =Model().load("../models/dtree_654750_gini_best.model")):
         self.model = model
 
     def get_best_move(self, chips: int) -> int:
@@ -26,10 +26,11 @@ class ExIt:
 
 if __name__ == '__main__':
     model = Model()
-    model.new_trained(datafile="../data/data_20k.csv")
+    model.new_trained(datafile="../data/data_20k.csv", name="iter10")
     model.print_sample()
     model.as_graph_image()
     model.save()
+    model.confusion_matrix_as_plot()
     # model = Model().load("../models/dtree_608405_gini_best.model")
     # model.print_sample()
     # import pdb; pdb.set_trace()

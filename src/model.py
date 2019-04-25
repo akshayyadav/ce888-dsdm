@@ -19,6 +19,7 @@ class Model(DTClassifier):
     def new_trained(self, datafile, name ="default"):
         self.name = name
         DTClassifier.__init__(self,datafile=datafile)
+        self.split_train_test()
         self.train()
         self.predict()
 
