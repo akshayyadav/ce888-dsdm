@@ -467,6 +467,8 @@ def UCT(rootstate, itermax, verbose=False):
         # Rollout - this can often be made orders of magnitude quicker using a state.GetRandomMove() function
         while state.GetMoves() != []: # while state is non-terminal
             state.DoMove(random.choice(state.GetMoves()))
+            # model = ExIt()
+            # state.DoMove(model.get_best_move(state.chips))
 
         # Backpropagate
         while node != None:  # backpropagate from the expanded node and work back to the root node
@@ -524,16 +526,17 @@ def UCTvsExItPlayGame():
             uct_move = UCT(rootstate=state, itermax=1000, verbose=False)  # play with values for itermax and verbose = True
             model = ExIt()
             m = model.get_best_move(state.chips)
-            print("UCT:ExIt=" + str(uct_move) + ":" + str(m))
+            # print("UCT:ExIt=" + str(uct_move) + ":" + str(m))
+            print(str(uct_move) + "," + str(m))
             # m = numpy.array([[state.chips,state.playerJustMoved,state.playerNext]])
         # print("Best Move: " + str(m) + "\n")
         state.DoMove(m)
-    if state.GetResult(state.playerJustMoved) == 1.0:
-        print("Player " + str(state.playerJustMoved) + " wins!")
-    elif state.GetResult(state.playerJustMoved) == 0.0:
-        print("Player " + str(3 - state.playerJustMoved) + " wins!")
-    else:
-        print("Nobody wins!")
+    # if state.GetResult(state.playerJustMoved) == 1.0:
+    #     print("Player " + str(state.playerJustMoved) + " wins!")
+    # elif state.GetResult(state.playerJustMoved) == 0.0:
+    #     print("Player " + str(3 - state.playerJustMoved) + " wins!")
+    # else:
+    #     print("Nobody wins!")
 
     state.GetResult(state.playerJustMoved)
     # print(str(state))
