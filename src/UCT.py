@@ -97,7 +97,7 @@ class NimState:
     def GetResult(self, playerjm):
         """ Get the game result from the viewpoint of playerjm.
         """
-        assert self.chips == 0
+        assert self.chips <= 0
         if self.playerJustMoved == playerjm:
             self.winner = self.playerJustMoved
             return 1.0
@@ -466,9 +466,10 @@ def UCT(rootstate, itermax, verbose=False):
 
         # Rollout - this can often be made orders of magnitude quicker using a state.GetRandomMove() function
         while state.GetMoves() != []: # while state is non-terminal
-            state.DoMove(random.choice(state.GetMoves()))
-            # model = ExIt()
-            # state.DoMove(model.get_best_move(state.chips))
+            # import pdb; pdb.set_trace()
+            # state.DoMove(random.choice(state.GetMoves()))
+            model = ExIt()
+            state.DoMove(model.get_best_move(state.chips))
 
         # Backpropagate
         while node != None:  # backpropagate from the expanded node and work back to the root node
@@ -545,5 +546,5 @@ def UCTvsExItPlayGame():
 if __name__ == "__main__":
     """ Play a single game to the end using UCT for both players."""
     for game in range(100):
-        # UCTPlayGame()
-        UCTvsExItPlayGame()
+        UCTPlayGame()
+        # UCTvsExItPlayGame()
