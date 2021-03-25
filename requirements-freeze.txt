@@ -127,7 +127,7 @@ pytest-aiohttp==0.3.0
 pytest-cov==2.5.1
 python-dateutil==2.7.3
 pytz==2018.5
-PyYAML==3.13
+PyYAML==5.4
 pyzmq==17.1.2
 qtconsole==4.4.3
 requests==2.21.0
