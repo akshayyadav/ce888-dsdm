@@ -21,7 +21,7 @@ aiohttp==3.3.2
 aiohttp-swagger==1.0.5
 aiojobs==0.2.2
 aniso8601==4.1.0
-ansible==2.7.6
+ansible==2.9.20
 appnope==0.1.0
 asn1crypto==0.24.0
 astor==0.7.1
