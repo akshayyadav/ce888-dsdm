@@ -1,6 +1,6 @@
 Keras==2.2.4
 graphviz==0.10.1
-ipython==7.2.0
+ipython==7.16.3
 joblib==0.13.2
 jupyter==1.0.0
 jupyter-contrib-nbextensions==0.5.1
