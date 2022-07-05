@@ -111,7 +111,7 @@ ptyprocess==0.6.0
 py==1.5.4
 pyasn1==0.4.5
 pycallgraph==1.0.1
-pycares==2.3.0
+pycares==4.2.0
 pycodestyle==2.4.0
 pycparser==2.19
 pyflakes==2.0.0
